@@ -9,8 +9,6 @@ package org.jenkinsci.plugins.MaidSafe_CI;
 
 
 public class maidsafeTask {
-
-
     private String _label;
 
     maidsafeTask(String label){

@@ -81,11 +81,15 @@ public class maidsafeRootAction implements UnprotectedRootAction {
     private maidsafeTask getTask(String label) {
         // look for existing maidsafeTask, or create new Task to track label
 
-        for (maidsafeTask m: msTasks) {
-            m.
+        String trimLabel = label.trim();
+        maidsafeTask ret;
+        if (msTasks.containsKey(trimLabel)) {
+            ret = msTasks.get(trimLabel);
+        } else {
+            ret = new maidsafeTask(trimLabel);
         }
 
-        return null;
+        return ret;
     }
 
     /*private Set<maidsafeTask> getTasks(GHRepository repo) throws IOException {

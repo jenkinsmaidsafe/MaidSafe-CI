@@ -67,12 +67,10 @@ public class maidsafeRootAction implements UnprotectedRootAction {
         try {
             if ("pull_request".equals(event)) {
                 GHEventPayload.PullRequest pr;
-                logger.log(Level.INFO, "Created GHPullRequest");
                 pr = msgh.get().parseEventPayload(new StringReader(payload), GHEventPayload.PullRequest.class);
-                logger.log(Level.INFO, "Parsed pr");
-                //pr = msgh.get().parseEventPayLoad(new StringReader(payload), GHEventPayload.PullRequest.class);
-
-                logger.log(Level.INFO, "pr label: {0}", pr.getPullRequest().getHead().getLabel());
+                String label = pr.getPullRequest().getHead().getLabel();
+                logger.log(Level.INFO, "Label of pull request: {0}", label);
+                maidsafeTask labeledTask = getTask(label);
 
             }
         } catch (IOException ex) {
@@ -80,7 +78,15 @@ public class maidsafeRootAction implements UnprotectedRootAction {
         }
     }
 
+    private maidsafeTask getTask(String label) {
+        // look for existing maidsafeTask, or create new Task to track label
 
+        for (maidsafeTask m: msTasks) {
+            m.
+        }
+
+        return null;
+    }
 
     /*private Set<maidsafeTask> getTasks(GHRepository repo) throws IOException {
         try {

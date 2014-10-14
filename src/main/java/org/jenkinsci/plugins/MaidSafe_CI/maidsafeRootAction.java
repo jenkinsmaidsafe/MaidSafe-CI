@@ -52,6 +52,12 @@ public class maidsafeRootAction implements UnprotectedRootAction {
     }
 
     public void doIndex(StaplerRequest req, StaplerResponse resp) {
+
+        //TODO: introduce a maidsafeBouncer that guards entry into the system,
+        //      originated from official maidsafe repository;
+        //      whitelisted authors should be checked later
+        //      until that stage new code should be quarantined
+
         logger.log(Level.INFO, "Triggered doIndex");
         String event = req.getHeader("X-GitHub-Event");
         String payload = req.getParameter("payload"); // setup GitHub webhook
@@ -71,6 +77,10 @@ public class maidsafeRootAction implements UnprotectedRootAction {
                 pr = msgh.get().parseEventPayload(new StringReader(payload), GHEventPayload.PullRequest.class);
                 String label = pr.getPullRequest().getHead().getLabel();
                 logger.log(Level.INFO, "Label of pull request: {0}", label);
+                logger.log(Level.INFO, "Author account of PR {0}.", pr.getPullRequest().getHead().getUser().getLogin());
+                logger.log(Level.INFO, "Reference branch of PR {0}.", pr.getPullRequest().getHead().getRef());
+                logger.log(Level.INFO, "Pull request number {0}.", pr.getNumber());
+                logger.log(Level.INFO, "Reference branch of PR {0}.", pr.getPullRequest().getHead().getSha());
                 maidsafeTask labelledTask = getTask(label);
                 labelledTask.onPullRequest(pr);
 

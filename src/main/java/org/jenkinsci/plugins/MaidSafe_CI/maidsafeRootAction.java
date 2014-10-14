@@ -18,6 +18,7 @@ import java.io.StringReader;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -70,23 +71,35 @@ public class maidsafeRootAction implements UnprotectedRootAction {
                 pr = msgh.get().parseEventPayload(new StringReader(payload), GHEventPayload.PullRequest.class);
                 String label = pr.getPullRequest().getHead().getLabel();
                 logger.log(Level.INFO, "Label of pull request: {0}", label);
-                maidsafeTask labeledTask = getTask(label);
+                maidsafeTask labelledTask = getTask(label);
+                labelledTask.onPullRequest(pr);
 
+            } else if ("issue_comment".equals(event)) {
+                logger.log(Level.INFO, "Comment issued, not handled yet in code.");
             }
         } catch (IOException ex) {
             logger.log(Level.SEVERE, "Failed to parse GitHub hook payload.", ex);
         }
+        logger.log(Level.INFO, "Finished handling event.");
     }
 
     private maidsafeTask getTask(String label) {
         // look for existing maidsafeTask, or create new Task to track label
 
+        logger.log(Level.INFO, "Requesting maidsafeTask for label {0}", label);
+        if (msTasks == null) {
+            logger.log(Level.INFO, "List of tasks is null; initialising new map.");
+            msTasks = new ConcurrentHashMap<String, maidsafeTask>();
+        }
+
         String trimLabel = label.trim();
         maidsafeTask ret;
         if (msTasks.containsKey(trimLabel)) {
             ret = msTasks.get(trimLabel);
+            logger.log(Level.INFO, "Found existing maidsafeTask for {0}", trimLabel);
         } else {
             ret = new maidsafeTask(trimLabel);
+            logger.log(Level.INFO, "Created new maidsafeTask for label {0}", trimLabel);
         }
 
         return ret;

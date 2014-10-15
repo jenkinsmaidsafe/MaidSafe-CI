@@ -80,7 +80,7 @@ public class maidsafeTask {
             ret = Repositories.get(trimRepo);
             logger.log(Level.INFO, "Found existing Repository for {0}", trimRepo);
         } else {
-            ret = new maidsafeTask(trimRepo);
+            ret = new maidsafeRepository(trimRepo);
             logger.log(Level.INFO, "Created new maidsafeRepository {0}", trimRepo);
         }
 

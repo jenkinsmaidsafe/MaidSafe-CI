@@ -8,7 +8,7 @@
 
   <groupId>org.jenkins-ci.plugins</groupId>
   <artifactId>MaidSafe-CI</artifactId>
-  <version>0.1.0.ben.7.3</version>
+  <version>0.1.073</version>
   <packaging>hpi</packaging>
 
   <licenses>

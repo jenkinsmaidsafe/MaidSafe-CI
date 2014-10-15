@@ -6,4 +6,9 @@ package org.jenkinsci.plugins.MaidSafe_CI;
 
 public class maidsafeRepository {
 
+    public maidsafeRepository(String repo) {
+        repository = repo;
+    }
+
+    private String repository;
 }

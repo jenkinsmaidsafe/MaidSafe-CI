@@ -81,6 +81,8 @@ public class maidsafeRootAction implements UnprotectedRootAction {
                 logger.log(Level.INFO, "Reference branch of PR {0}.", pr.getPullRequest().getHead().getRef());
                 logger.log(Level.INFO, "Pull request number {0}.", pr.getNumber());
                 logger.log(Level.INFO, "Reference branch of PR {0}.", pr.getPullRequest().getHead().getSha());
+                logger.log(Level.INFO, "URL of PR {0}.", pr.getPullRequest().getHead().getRepository().getFullName());
+
                 maidsafeTask labelledTask = getTask(label);
                 labelledTask.onPullRequest(pr);
 

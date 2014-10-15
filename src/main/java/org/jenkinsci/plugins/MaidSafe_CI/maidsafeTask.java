@@ -1,8 +1,10 @@
 package org.jenkinsci.plugins.MaidSafe_CI;
 
 import org.kohsuke.github.GHEventPayload;
+import org.kohsuke.github.GHPullRequest;
 import org.kohsuke.github.GHRepository;
 
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -32,7 +34,7 @@ public class maidsafeTask {
 
         logger.log(Level.INFO, "Pull request received for maidsafeTask {0}.", _label);
 
-        maidsafeRepository msRepo = getRepository(pr.getPullRequest().getRepository());
+        maidsafeRepository msRepo = getRepository(pr.getPullRequest());
 
         if ("opened".equals(pr.getAction()) || "reopened".equals(pr.getAction())) {
             logger.log(Level.INFO, "Pull request (re)opened");
@@ -40,10 +42,14 @@ public class maidsafeTask {
         }
     }
 
-    private maidsafeRepository getRepository(GHRepository repo) {
+    private maidsafeRepository getRepository(GHPullRequest pullRequest) {
+        final GHRepository repo = pullRequest.getRepository();
         try {
-            logger.log(Level.INFO, "Repository from {0} named {1}.", new Object[]{repo.getOwner().getLogin(), repo.getName()});
-            return getRepository(repo.getOwner().getLogin() + "/" + repo.getName());
+            logger.log(Level.INFO, "Pull request full name {0}",
+                     pullRequest.getHead().getRepository().getFullName());
+            logger.log(Level.INFO, "DEBUG: catch clause {0}",
+                     repo.getUrl());
+            return getRepository(pullRequest.getHead().getRepository().getFullName());
         } catch (Exception ex) {
             logger.log(Level.WARNING, "Can't get a valid owner for repo " + repo.getName());
             // this normally happens due to missing "login" field in the owner of the repo
@@ -62,7 +68,23 @@ public class maidsafeTask {
     }
 
     private maidsafeRepository getRepository(String repo) {
-        return null;
+
+        if (Repositories == null) {
+            Repositories = new ConcurrentHashMap<String, maidsafeRepository>();
+        }
+
+        String trimRepo = repo.trim();
+        maidsafeRepository ret;
+
+        if (Repositories.containsKey(trimRepo)) {
+            ret = Repositories.get(trimRepo);
+            logger.log(Level.INFO, "Found existing Repository for {0}", trimRepo);
+        } else {
+            ret = new maidsafeTask(trimRepo);
+            logger.log(Level.INFO, "Created new maidsafeRepository {0}", trimRepo);
+        }
+
+        return ret;
     }
 
 

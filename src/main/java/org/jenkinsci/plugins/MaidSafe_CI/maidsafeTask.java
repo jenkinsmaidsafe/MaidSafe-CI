@@ -36,8 +36,9 @@ public class maidsafeTask {
 
         maidsafeRepository msRepo = getRepository(pr.getPullRequest());
 
-        if ("opened".equals(pr.getAction()) || "reopened".equals(pr.getAction())) {
-            logger.log(Level.INFO, "Pull request (re)opened");
+        try {
+            msRepo.onPullRequest(pr);
+        } catch (IllegalStateException ex) {
 
         }
     }
@@ -45,13 +46,16 @@ public class maidsafeTask {
     private maidsafeRepository getRepository(GHPullRequest pullRequest) {
         final GHRepository repo = pullRequest.getRepository();
         try {
-            logger.log(Level.INFO, "Pull request full name {0}",
-                     pullRequest.getHead().getRepository().getFullName());
-            logger.log(Level.INFO, "DEBUG: catch clause {0}",
+            String repoID = pullRequest.getHead().getRepository().getFullName()+':'+
+                    pullRequest.getHead().getRef();
+            logger.log(Level.INFO, "Pull request for repoID {0}", repoID);
+            logger.log(Level.INFO, "DEBUG: catch clause is wrong: {0}",
                      repo.getUrl());
-            return getRepository(pullRequest.getHead().getRepository().getFullName());
+            return getRepository(repoID);
         } catch (Exception ex) {
-            logger.log(Level.WARNING, "Can't get a valid owner for repo " + repo.getName());
+            logger.log(Level.WARNING, "(CORRECT ME) Can't get a valid owner for repo " + repo.getName());
+
+            // TODO:  WRONG: getUrl() gives url to maidsafe repository !!
             // this normally happens due to missing "login" field in the owner of the repo
             // when the repo is inside of an organisation account. The only field which doesn't
             // rely on the owner.login (which would throw a null pointer exception) is the "html_url"
@@ -67,21 +71,21 @@ public class maidsafeTask {
         }
     }
 
-    private maidsafeRepository getRepository(String repo) {
+    private maidsafeRepository getRepository(String repoID) {
 
         if (Repositories == null) {
             Repositories = new ConcurrentHashMap<String, maidsafeRepository>();
         }
 
-        String trimRepo = repo.trim();
+        String trimRepoID = repoID.trim();
         maidsafeRepository ret;
 
-        if (Repositories.containsKey(trimRepo)) {
-            ret = Repositories.get(trimRepo);
-            logger.log(Level.INFO, "Found existing Repository for {0}", trimRepo);
+        if (Repositories.containsKey(trimRepoID)) {
+            ret = Repositories.get(trimRepoID);
+            logger.log(Level.INFO, "Found existing maidsafeRepository for {0}", trimRepoID);
         } else {
-            ret = new maidsafeTask(trimRepo);
-            logger.log(Level.INFO, "Created new maidsafeRepository {0}", trimRepo);
+            ret = new maidsafeRepository(trimRepoID);
+            logger.log(Level.INFO, "Created new maidsafeRepository {0}", trimRepoID);
         }
 
         return ret;

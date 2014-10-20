@@ -2,7 +2,9 @@ package org.jenkinsci.plugins.MaidSafe_CI;
 
 import org.kohsuke.github.GHEventPayload;
 import org.kohsuke.github.GHPullRequest;
+import org.kohsuke.github.GHUser;
 
+import java.util.concurrent.ConcurrentMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -13,6 +15,8 @@ import java.util.logging.Logger;
 public class maidsafeRepository {
     private static final Logger logger = Logger.getLogger(maidsafeRepository.class.getName());
     private final String _repoID; // "developer/repository:MAID" as a unique ID
+    private GHUser _developer;
+    private ConcurrentMap<Integer, maidsafePullRequest> pulls;
 
     maidsafeRepository(String repoID) {
         this._repoID = repoID.trim();
@@ -36,6 +40,14 @@ public class maidsafeRepository {
         if ("opened".equals(pr.getAction()) || "reopened".equals(pr.getAction())) {
             logger.log(Level.INFO, "Pull request (re)opened");
 
+        }
+    }
+
+    public String getDevLogin() {
+        if (_developer == null) {
+            return new String("");
+        } else {
+            return _developer.getLogin();
         }
     }
 }

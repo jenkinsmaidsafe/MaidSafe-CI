@@ -55,7 +55,7 @@ public class maidsafeRootAction implements UnprotectedRootAction {
 
         //TODO: introduce a maidsafeBouncer that guards entry into the system,
         //      originated from official maidsafe repository;
-        //      whitelisted authors should be checked later
+        //      whitelisted authors should be checked before build execution
         //      until that stage new code should be quarantined
 
         logger.log(Level.INFO, "Triggered doIndex");

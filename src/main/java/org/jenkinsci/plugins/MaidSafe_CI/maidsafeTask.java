@@ -39,57 +39,29 @@ public class maidsafeTask {
         try {
             msRepo.onPullRequest(pr);
         } catch (IllegalStateException ex) {
-
+            // TODO: catch
         }
     }
 
     private maidsafeRepository getRepository(GHPullRequest pullRequest) {
         final GHRepository repo = pullRequest.getRepository();
-        try {
-            String repoID = pullRequest.getHead().getRepository().getFullName()+':'+
-                    pullRequest.getHead().getRef();
-            logger.log(Level.INFO, "Pull request for repoID {0}", repoID);
-            logger.log(Level.INFO, "DEBUG: catch clause is wrong: {0}",
-                     repo.getUrl());
-            return getRepository(repoID);
-        } catch (Exception ex) {
-            logger.log(Level.WARNING, "(CORRECT ME) Can't get a valid owner for repo " + repo.getName());
-
-            // TODO:  WRONG: getUrl() gives url to maidsafe repository !!
-            // this normally happens due to missing "login" field in the owner of the repo
-            // when the repo is inside of an organisation account. The only field which doesn't
-            // rely on the owner.login (which would throw a null pointer exception) is the "html_url"
-            // field. So we try to parse the owner out of that here until github fixes his api
-            String repoUrl = repo.getUrl();
-            if (repoUrl.endsWith("/")) {// strip off trailing slash if any
-                repoUrl = repoUrl.substring(0, repoUrl.length() - 2);
-            }
-            int slashIndex = repoUrl.lastIndexOf('/');
-            String owner = repoUrl.substring(slashIndex + 1);
-            logger.log(Level.INFO, "Parsed {0} from {1}", new Object[]{owner, repoUrl});
-            return getRepository(owner + "/" + repo.getName());
-        }
-    }
-
-    private maidsafeRepository getRepository(String repoID) {
-
+        maidsafeRepository ret;
         if (Repositories == null) {
             Repositories = new ConcurrentHashMap<String, maidsafeRepository>();
         }
 
-        String trimRepoID = repoID.trim();
-        maidsafeRepository ret;
+        String repoID = pullRequest.getHead().getRepository().getFullName()+':'+
+                pullRequest.getHead().getRef();
 
-        if (Repositories.containsKey(trimRepoID)) {
-            ret = Repositories.get(trimRepoID);
-            logger.log(Level.INFO, "Found existing maidsafeRepository for {0}", trimRepoID);
+        logger.log(Level.INFO, "Pull request for repoID {0}", repoID);
+
+        if (Repositories.containsKey(repoID)) {
+            ret = Repositories.get(repoID);
+            logger.log(Level.INFO, "Found existing maidsafeRepository for {0}", repoID);
         } else {
-            ret = new maidsafeRepository(trimRepoID);
-            logger.log(Level.INFO, "Created new maidsafeRepository {0}", trimRepoID);
+            ret = new maidsafeRepository(pullRequest);
+            logger.log(Level.INFO, "Created new maidsafeRepository {0}", repoID);
         }
-
         return ret;
     }
-
-
 }

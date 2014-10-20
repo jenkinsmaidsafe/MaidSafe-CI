@@ -2,6 +2,7 @@ package org.jenkinsci.plugins.MaidSafe_CI;
 
 import org.kohsuke.github.GHEventPayload;
 import org.kohsuke.github.GHPullRequest;
+import org.kohsuke.github.GHRepository;
 import org.kohsuke.github.GHUser;
 
 import java.util.concurrent.ConcurrentMap;
@@ -15,12 +16,19 @@ import java.util.logging.Logger;
 public class maidsafeRepository {
     private static final Logger logger = Logger.getLogger(maidsafeRepository.class.getName());
     private final String _repoID; // "developer/repository:MAID" as a unique ID
+    private final String _fullName;
     private GHUser _developer;
+    private GHRepository _devRepo;
     private ConcurrentMap<Integer, maidsafePullRequest> pulls;
 
-    maidsafeRepository(String repoID) {
-        this._repoID = repoID.trim();
-        logger.log(Level.INFO, "Initialised maidsafeRepository for {0}", repoID);
+
+    maidsafeRepository(GHPullRequest pullRequest) {
+        _repoID = pullRequest.getHead().getRepository().getFullName()+':'+
+                pullRequest.getHead().getRef();
+        _devRepo = pullRequest.getHead().getRepository();
+        _fullName = pullRequest.getHead().getRepository().getFullName();
+        _developer = pullRequest.getHead().getUser();
+        logger.log(Level.INFO, "Initialised maidsafeRepository for {0}", _repoID);
     }
 
     public String getRepoID() {
@@ -29,8 +37,8 @@ public class maidsafeRepository {
 
     public void onPullRequest(GHEventPayload.PullRequest pr) throws IllegalStateException {
         // check whether ID matches
-        String repoID = pr.getPullRequest().getHead().getRepository().getFullName()+':'+
-                pr.getPullRequest().getHead().getRef();
+        String fullName = pr.getPullRequest().getHead().getRepository().getFullName();
+        String repoID = fullName +':'+ pr.getPullRequest().getHead().getRef();
         if (!_repoID.equals(repoID)) {
             logger.log(Level.SEVERE, "ERROR: pull request {0} passed to maidsafeRepository {1} doesn't match.",
                     new Object[]{repoID.trim(), _repoID});
@@ -49,5 +57,9 @@ public class maidsafeRepository {
         } else {
             return _developer.getLogin();
         }
+    }
+
+    public String getName() {
+
     }
 }

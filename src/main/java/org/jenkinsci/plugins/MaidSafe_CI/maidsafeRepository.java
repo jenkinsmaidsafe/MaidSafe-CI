@@ -52,14 +52,15 @@ public class maidsafeRepository {
     }
 
     public String getDevLogin() {
-        if (_developer == null) {
+        if (_developer == null) {  // is now initialised in constructor; should not be null
+            logger.log(Level.SEVERE, "Developer object was not initialised in repo {0}!", _repoID);
             return new String("");
         } else {
             return _developer.getLogin();
         }
     }
 
-    public String getName() {
-
+    public String getFullName() {
+        return _fullName;
     }
 }

@@ -17,8 +17,8 @@ public class maidsafePullRequest {
     private static final Logger logger = Logger.getLogger(maidsafePullRequest.class.getName());
     private triBool MergeableState;
     private final int id;
-    private maidsafeRepository repo
-;    private Vector<String> SHAs;  //
+    private maidsafeRepository repo;
+    private Vector<String> SHAs;  //
     //private ConcurrentMap<String, > anything history related, mapped on hash
 
     maidsafePullRequest(GHPullRequest pr, maidsafeRepository repo) {

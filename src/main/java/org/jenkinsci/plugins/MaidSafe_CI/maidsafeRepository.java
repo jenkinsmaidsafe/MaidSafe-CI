@@ -5,6 +5,7 @@ import org.kohsuke.github.GHPullRequest;
 import org.kohsuke.github.GHRepository;
 import org.kohsuke.github.GHUser;
 
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -58,6 +59,25 @@ public class maidsafeRepository {
         } else {
             return _developer.getLogin();
         }
+    }
+
+    private maidsafePullRequest getPullRequest(GHPullRequest pr) {
+        maidsafePullRequest ret;
+        if (pulls == null) {
+            pulls = new ConcurrentHashMap<Integer, maidsafePullRequest>();
+        }
+
+        if (pulls.containsKey(pr.getNumber())) {
+            ret = pulls.get(pr.getNumber());
+            logger.log(Level.INFO, "Found existing maidsafePullRequest number {0} for repository {1}",
+                    new Object[]{pr.getNumber(), _repoID});
+        } else {
+            ret = new maidsafePullRequest(pr, this);
+            logger.log(Level.INFO, "Created new maidsafePullRequest number {0} for repository {1}",
+                    new Object[]{pr.getNumber(), _repoID});
+        }
+
+        return ret;
     }
 
     public String getFullName() {

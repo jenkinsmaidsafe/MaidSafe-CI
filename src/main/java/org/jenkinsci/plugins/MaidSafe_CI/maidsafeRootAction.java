@@ -106,12 +106,19 @@ public class maidsafeRootAction implements UnprotectedRootAction {
 
         String trimLabel = label.trim();
         maidsafeTask ret;
+
         if (msTasks.containsKey(trimLabel)) {
             ret = msTasks.get(trimLabel);
-            logger.log(Level.INFO, "Found existing maidsafeTask for {0}", trimLabel);
+            if (ret == null) {
+                logger.log(Level.SEVERE, "Found existing maidsafeTask for {0}, but is NULL", trimLabel);
+                msTasks.replace(trimLabel, new maidsafeTask(trimLabel));
+                ret = msTasks.get(trimLabel);
+            }
+            logger.log(Level.INFO, "Found existing maidsafeTask for {0}", ret.getLabel());
         } else {
-            ret = new maidsafeTask(trimLabel);
-            logger.log(Level.INFO, "Created new maidsafeTask for label {0}", trimLabel);
+            msTasks.putIfAbsent(trimLabel, new maidsafeTask(trimLabel));
+            ret = msTasks.get(trimLabel);
+            logger.log(Level.INFO, "Created new maidsafeTask for label {0}", ret.getLabel());
         }
 
         return ret;

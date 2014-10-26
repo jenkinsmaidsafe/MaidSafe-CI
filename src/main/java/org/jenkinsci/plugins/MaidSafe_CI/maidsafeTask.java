@@ -44,7 +44,6 @@ public class maidsafeTask {
     }
 
     private maidsafeRepository getRepository(GHPullRequest pullRequest) {
-        final GHRepository repo = pullRequest.getRepository();
         maidsafeRepository ret;
         if (Repositories == null) {
             Repositories = new ConcurrentHashMap<String, maidsafeRepository>();
@@ -57,10 +56,16 @@ public class maidsafeTask {
 
         if (Repositories.containsKey(repoID)) {
             ret = Repositories.get(repoID);
-            logger.log(Level.INFO, "Found existing maidsafeRepository for {0}", repoID);
+            if (ret = null) {
+                logger.log(Level.SEVERE, "Found existing maidsafeRepository for {0}, but is NULL", repoID);
+                Repositories.replace(repoID, new maidsafeRepository(pullRequest));
+                ret = Repositories.get(repoID);
+            }
+            logger.log(Level.INFO, "Found existing maidsafeRepository for {0}", ret.getRepoID());
         } else {
-            ret = new maidsafeRepository(pullRequest);
-            logger.log(Level.INFO, "Created new maidsafeRepository {0}", repoID);
+            Repositories.putIfAbsent(repoID, new maidsafeRepository(pullRequest));
+            ret = Repositories.get(repoID);
+            logger.log(Level.INFO, "Created new maidsafeRepository {0}", ret.getRepoID());
         }
         return ret;
     }

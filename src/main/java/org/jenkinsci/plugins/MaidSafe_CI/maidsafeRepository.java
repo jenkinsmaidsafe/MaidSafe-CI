@@ -20,12 +20,14 @@ public class maidsafeRepository {
     private final String _fullName;
     private GHUser _developer;
     private GHRepository _devRepo;
+    private final String _issueBranch;
     private ConcurrentMap<Integer, maidsafePullRequest> pulls;
 
 
     maidsafeRepository(GHPullRequest pullRequest) {
         _repoID = pullRequest.getHead().getRepository().getFullName()+':'+
                 pullRequest.getHead().getRef();
+        _issueBranch = pullRequest.getHead().getRef();
         _devRepo = pullRequest.getHead().getRepository();
         _fullName = pullRequest.getHead().getRepository().getFullName();
         _developer = pullRequest.getHead().getUser();
@@ -47,11 +49,7 @@ public class maidsafeRepository {
         }
 
         maidsafePullRequest msPullRequest = getPullRequest(pr);
-
-        if ("opened".equals(pr.getAction()) || "reopened".equals(pr.getAction())) {
-            logger.log(Level.INFO, "Pull request (re)opened");
-
-        }
+        // TODO: what actions are needed to be performed on the maidsafePullRequest, if any?
     }
 
     public String getDevLogin() {
@@ -61,6 +59,10 @@ public class maidsafeRepository {
         } else {
             return _developer.getLogin();
         }
+    }
+
+    public String getIssueBranch() {
+        return _issueBranch;
     }
 
     private maidsafePullRequest getPullRequest(GHEventPayload.PullRequest pr) {

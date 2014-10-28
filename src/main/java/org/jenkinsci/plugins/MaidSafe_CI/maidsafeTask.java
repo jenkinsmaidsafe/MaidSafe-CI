@@ -38,6 +38,12 @@ public class maidsafeTask {
 
         try {
             msRepo.onPullRequest(pr);
+
+            if ("opened".equals(pr.getAction()) || "reopened".equals(pr.getAction())) {
+                logger.log(Level.INFO, "Pull request (re)opened");
+
+            }
+
         } catch (IllegalStateException ex) {
             // TODO: catch
         }

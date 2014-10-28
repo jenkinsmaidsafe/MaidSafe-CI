@@ -67,14 +67,21 @@ public class maidsafeRepository {
             pulls = new ConcurrentHashMap<Integer, maidsafePullRequest>();
         }
 
-        if (pulls.containsKey(pr.getNumber())) {
-            ret = pulls.get(pr.getNumber());
+        Integer prNumber = pr.getNumber();
+        if (pulls.containsKey(prNumber)) {
+            ret = pulls.get(prNumber);
+            if (ret == null) {
+                logger.log(Level.INFO, "Found existing maidsafePullRequest number {0} for repository {1}, but is NULL.",
+                        new Object[]{prNumber, _repoID});
+                pulls.replace(prNumber, new maidsafePullRequest(pr, this));
+                ret = pulls.get(prNumber);
+            }
             logger.log(Level.INFO, "Found existing maidsafePullRequest number {0} for repository {1}",
-                    new Object[]{pr.getNumber(), _repoID});
+                    new Object[]{prNumber, _repoID});
         } else {
             ret = new maidsafePullRequest(pr, this);
             logger.log(Level.INFO, "Created new maidsafePullRequest number {0} for repository {1}",
-                    new Object[]{pr.getNumber(), _repoID});
+                    new Object[]{prNumber, _repoID});
         }
 
         return ret;

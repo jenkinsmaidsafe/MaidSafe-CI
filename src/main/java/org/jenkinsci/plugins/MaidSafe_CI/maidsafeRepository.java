@@ -46,6 +46,8 @@ public class maidsafeRepository {
             throw new IllegalStateException("ID constructed from PR " + repoID + " does not match " + _repoID);
         }
 
+        maidsafePullRequest msPullRequest = getPullRequest(pr);
+
         if ("opened".equals(pr.getAction()) || "reopened".equals(pr.getAction())) {
             logger.log(Level.INFO, "Pull request (re)opened");
 
@@ -61,7 +63,7 @@ public class maidsafeRepository {
         }
     }
 
-    private maidsafePullRequest getPullRequest(GHPullRequest pr) {
+    private maidsafePullRequest getPullRequest(GHEventPayload.PullRequest pr) {
         maidsafePullRequest ret;
         if (pulls == null) {
             pulls = new ConcurrentHashMap<Integer, maidsafePullRequest>();

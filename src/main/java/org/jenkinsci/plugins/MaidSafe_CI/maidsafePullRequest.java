@@ -1,5 +1,6 @@
 package org.jenkinsci.plugins.MaidSafe_CI;
 
+import org.kohsuke.github.GHEventPayload;
 import org.kohsuke.github.GHPullRequest;
 
 import java.io.IOException;
@@ -21,11 +22,11 @@ public class maidsafePullRequest {
     private Vector<String> SHAs;  //
     //private ConcurrentMap<String, > anything history related, mapped on hash
 
-    maidsafePullRequest(GHPullRequest pr, maidsafeRepository repo) {
+    maidsafePullRequest(GHEventPayload.PullRequest pr, maidsafeRepository repo) {
         id = pr.getNumber();
         SHAs = new Vector<String>();
-        SHAs.add(pr.getHead().getSha());
-        setMergeableState(pr);
+        SHAs.add(pr.getPullRequest().getHead().getSha());
+        setMergeableState(pr.getPullRequest());
         this.repo = repo;
         logger.log(Level.INFO, "MaidSafe Pull Request number {1} initialised with SHA {0}.", new Object[]{SHAs.lastElement(), id});
     }

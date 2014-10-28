@@ -56,7 +56,7 @@ public class maidsafeTask {
 
         if (Repositories.containsKey(repoID)) {
             ret = Repositories.get(repoID);
-            if (ret = null) {
+            if (ret == null) {
                 logger.log(Level.SEVERE, "Found existing maidsafeRepository for {0}, but is NULL", repoID);
                 Repositories.replace(repoID, new maidsafeRepository(pullRequest));
                 ret = Repositories.get(repoID);
